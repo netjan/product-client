@@ -1,14 +1,18 @@
-version: '3'
+version: "3.4"
 
+# Development environment override
 services:
-###> doctrine/doctrine-bundle ###
-  database:
-    ports:
-      - "5432"
-###< doctrine/doctrine-bundle ###
+  php:
+    build:
+      target: app_php_dev
+    volumes:
+      - ./:/var/www/html
+    environment:
+      # See https://xdebug.org/docs/all_settings#mode 
+      XDEBUG_MODE: "${XDEBUG_MODE:-off}"
+      # See https://xdebug.org/docs/all_settings#XDEBUG_CONFIG
+      XDEBUG_CONFIG: "${XDEBUG_CONFIG:-}"
 
-###> symfony/mailer ###
-  mailer:
-    image: schickling/mailcatcher
-    ports: ["1025", "1080"]
-###< symfony/mailer ###
+  web:
+    volumes:
+      - ./:/var/www/html
