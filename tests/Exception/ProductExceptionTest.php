@@ -2,7 +2,7 @@
 
 namespace App\Tests\Exception;
 
-use App\Exception\ApiClientException;
+use App\Exception\NotFoundException;
 use App\Exception\ConnectionException;
 use App\Exception\ExceptionInterface;
 use PHPUnit\Framework\TestCase;
@@ -12,19 +12,19 @@ class ProductExceptionTest extends TestCase
     public function exceptionDataProvider(): \Generator
     {
         yield [
-            new ApiClientException(),
-            'API error',
+            new NotFoundException(),
+            'Not Found',
         ];
         yield [
             new ConnectionException(),
-            'Connection error',
+            'Server Connection Error',
         ];
     }
 
     public function classesDataProvider(): array
     {
         return [
-            [ApiClientException::class],
+            [NotFoundException::class],
             [ConnectionException::class],
         ];
     }

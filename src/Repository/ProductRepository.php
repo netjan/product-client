@@ -17,7 +17,7 @@ class ProductRepository implements HttpClientInterface
 {
     use DecoratorTrait;
 
-    private const RELATIVE_URL = '/booksss';
+    private const RELATIVE_URL = '/books';
 
     /**
      * @return Product[]
@@ -72,6 +72,6 @@ class ProductRepository implements HttpClientInterface
             throw new ConnectionException($e);
         }
 
-                return $items;
+        return $items;
     }
 }
