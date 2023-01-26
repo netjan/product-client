@@ -25,4 +25,4 @@ services:
 
     App\Repository\ProductRepository:
         arguments:
-            $client: '@App\Service\ApiClient\ApiClient'
+            $client: '@my_api.client'

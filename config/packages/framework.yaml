@@ -18,6 +18,13 @@ framework:
     php_errors:
         log: true
 
+    http_client:
+        scoped_clients:
+            my_api.client:
+                base_uri: 'https://demo.api-platform.com'
+                headers:
+                    accept: 'application/json'
+
 when@test:
     framework:
         test: true

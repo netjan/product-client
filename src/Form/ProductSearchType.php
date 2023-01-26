@@ -16,8 +16,8 @@ class ProductSearchType extends AbstractType
             ->add('stock', ChoiceType::class, [
                 'choices' => $this->getStockChoices(),
                 'choice_translation_domain' => false,
-                'label' => 'Filtruj produkty',
-                'placeholder' => 'Wszystkie produkty',
+                'label' => 'Filter',
+                'placeholder' => 'All items',
                 'required' => false,
             ])
 
@@ -42,9 +42,9 @@ class ProductSearchType extends AbstractType
     private function getStockChoices(): array
     {
         return [
-            'Znajdują się na składzie' => 'true',
-            'Nie znajdują się na składzie' => 'false',
-            'Znajdują się na składzie w ilości większej niż 5' => '5',
+            'They are in stock' => 'true',
+            'They are not in stocke' => 'false',
+            'More than 5 are in stock' => '5',
         ];
     }
 }

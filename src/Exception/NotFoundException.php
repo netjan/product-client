@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-class ApiClientException extends AbstractException implements ExceptionInterface
+class NotFoundException extends AbstractException implements ExceptionInterface
 {
     protected function getReason(): string
     {
-        return 'API error';
+        return 'Not Found';
     }
 }
