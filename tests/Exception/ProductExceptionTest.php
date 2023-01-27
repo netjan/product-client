@@ -2,22 +2,27 @@
 
 namespace App\Tests\Exception;
 
-use App\Exception\NotFoundException;
-use App\Exception\ConnectionException;
-use App\Exception\ExceptionInterface;
 use PHPUnit\Framework\TestCase;
+use App\Exception\NotFoundException;
+use App\Exception\ExceptionInterface;
+use App\Exception\ConnectionException;
+use App\Exception\DataTransferException;
 
 class ProductExceptionTest extends TestCase
 {
     public function exceptionDataProvider(): \Generator
     {
         yield [
-            new NotFoundException(),
-            'Not Found',
+            new ConnectionException(),
+            'Server connection error',
         ];
         yield [
-            new ConnectionException(),
-            'Server Connection Error',
+            new DataTransferException(),
+            'Data transfer error',
+        ];
+        yield [
+            new NotFoundException(),
+            'Not found',
         ];
     }
 

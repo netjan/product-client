@@ -4,10 +4,12 @@ namespace App\Repository;
 
 use App\Entity\Product;
 use App\Exception\ConnectionException;
+use App\Exception\DataTransferException;
 use App\Exception\NotFoundException;
 use App\Filter\ProductFilter;
 use Symfony\Component\HttpClient\DecoratorTrait;
-use Symfony\Component\HttpClient\Exception\ClientException;
+use Symfony\Component\HttpClient\Exception\JsonException;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -32,6 +34,14 @@ class ProductRepository implements HttpClientInterface
         $response = $this->request('GET', self::RELATIVE_URL, [
             'query' => $query,
         ]);
+
+        $statusCode = $this->getStatusCode($response);
+        if (Response::HTTP_NOT_FOUND === $statusCode) {
+            throw new NotFoundException();
+        }
+        if (Response::HTTP_OK !== $statusCode) {
+            throw new ConnectionException();
+        }
 
         $items = $this->responseToArray($response);
         $result = [];
@@ -66,12 +76,21 @@ class ProductRepository implements HttpClientInterface
     {
         try {
             $items = $response->toArray();
-        } catch (ClientException $e) {
-            throw new NotFoundException($e);
+        } catch (JsonException $e) {
+            throw new DataTransferException($e);
+        }
+
+        return $items;
+    }
+
+    private function getStatusCode(ResponseInterface $response): int
+    {
+        try {
+            $statusCode = $response->getStatusCode();
         } catch (ExceptionInterface $e) {
             throw new ConnectionException($e);
         }
 
-        return $items;
+        return $statusCode;
     }
 }

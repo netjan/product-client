@@ -8,6 +8,6 @@ class ConnectionException extends AbstractException implements ExceptionInterfac
 {
     protected function getReason(): string
     {
-        return 'Server Connection Error';
+        return 'Server connection error';
     }
 }
