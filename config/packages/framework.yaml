@@ -21,9 +21,17 @@ framework:
     http_client:
         scoped_clients:
             my_api.client:
-                base_uri: 'https://demo.api-platform.com'
+                base_uri: 'https://product-server/api/'
                 headers:
-                    accept: 'application/json'
+                    accept: 'application/json'                
+
+when@dev:
+    framework:
+        http_client:
+            scoped_clients:
+                my_api.client:
+                    verify_host: false
+                    verify_peer: false
 
 when@test:
     framework:

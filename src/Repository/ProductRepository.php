@@ -19,7 +19,23 @@ class ProductRepository implements HttpClientInterface
 {
     use DecoratorTrait;
 
-    private const RELATIVE_URL = '/books';
+    private const RELATIVE_URL = 'products';
+
+    public function find(string $id): ?Product
+    {
+        $response = $this->request('GET', self::RELATIVE_URL.'/'.$id);
+
+        $statusCode = $this->getStatusCode($response);
+        if (Response::HTTP_NOT_FOUND === $statusCode) {
+            return null;
+        }
+        if (Response::HTTP_OK !== $statusCode) {
+            throw new ConnectionException();
+        }
+        $item = $this->responseToArray($response);
+
+        return $this->createProduct($item);
+    }
 
     /**
      * @return Product[]
@@ -53,6 +69,36 @@ class ProductRepository implements HttpClientInterface
         }
 
         return $result;
+    }
+
+    public function save(Product $product): void
+    {
+        $id = (string) $product->getId();
+        $response = $this->request('PUT', self::RELATIVE_URL.'/'.$id, [
+            'json' => [
+                'name' => $product->getName(),
+                'amount' => $product->getAmount(),
+            ],
+        ]);
+        $statusCode = $this->getStatusCode($response);
+        if (Response::HTTP_NOT_FOUND === $statusCode) {
+            throw new NotFoundException();
+        }
+        if (Response::HTTP_OK !== $statusCode) {
+            throw new ConnectionException();
+        }
+        $item = $this->responseToArray($response);
+
+        $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
+            ->disableExceptionOnInvalidPropertyPath()
+            ->getPropertyAccessor();
+
+        $product->setName((string) $propertyAccessor->getValue($item, '[name]'));
+        $product->setAmount((int) $propertyAccessor->getValue($item, '[amount]'));
+    }
+
+    public function remove(string $id): void
+    {
     }
 
     private function createProduct(array $item): ?Product
