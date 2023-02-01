@@ -8,6 +8,6 @@ class NotFoundException extends AbstractException implements ExceptionInterface
 {
     protected function getReason(): string
     {
-        return 'Not Found';
+        return 'Not found';
     }
 }

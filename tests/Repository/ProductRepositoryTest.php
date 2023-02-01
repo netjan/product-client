@@ -2,8 +2,14 @@
 
 namespace App\Tests\Repository;
 
-use App\Repository\ProductRepository;
+use App\Entity\Product;
+use App\Filter\ProductFilter;
+use App\Tests\Fixtures\Helper;
 use PHPUnit\Framework\TestCase;
+use App\Exception\NotFoundException;
+use App\Repository\ProductRepository;
+use App\Exception\ConnectionException;
+use App\Exception\DataTransferException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
@@ -16,34 +22,146 @@ class ProductRepositoryTest extends TestCase
         $this->assertInstanceOf(ProductRepository::class, $testRepository);
     }
 
-    public function testResponseToArray(): void
+    /**
+     * @dataProvider dataForFindByProductFilter
+     */
+    public function testFindByProductFilter(array $expected, ?bool $stock): void
     {
-        $items = [
-            [
-                'id' => 1, 'name' => 'Nazwa', 'amount' => 1,
-            ],
-            [
-                'id' => 2, 'name' => 'Nazwa', 'amount' => 1,
-            ],
-        ];
-
-
-        $responses = [
-            new MockResponse(json_encode($items)),
-        ];
-        $client = new MockHttpClient($responses);
+        $response = new MockResponse(json_encode($expected));
+        $client = new MockHttpClient($response);
         $testRepository = new ProductRepository($client);
-        $response = $client->request('GET', '/books');
-        $state = $this->invokeMethod($testRepository, 'responseToArray', array($response));
-        $this->assertEquals($items, $state);
+        $filter = new ProductFilter();
+        $filter->stock = $stock;
+        $actual = $testRepository->findByProductFilter($filter);
+        $this->assertSame(count($expected), count($actual));
+        foreach ($expected as $item) {
+            $isFound = false;
+            foreach ($actual as $product) {
+                if ($item['id'] === $product->getId()) {
+                    $this->assertSame($item['name'], $product->getName());
+                    $this->assertSame($item['amount'], $product->getAmount());
+                    $isFound = true;
+                }
+            }
+            if (!$isFound) {
+                $this->assertTrue(false, sprintf('Not found "item" with id: %d', $item['id']));
+            }
+        }
     }
 
-    public function invokeMethod(&$object, $methodName, array $parameters = [])
+    public function dataForFindByProductFilter(): array
     {
-        $reflection = new \ReflectionClass(get_class($object));
-        $method = $reflection->getMethod($methodName);
-        $method->setAccessible(true);
+        return [
+            [
+                [
+                    [
+                        'id' => 1, 'name' => 'Name 1', 'amount' => 1,
+                    ],
+                    [
+                        'id' => 2, 'name' => 'Name 2', 'amount' => 2,
+                    ],
+                    [
+                        'id' => 3, 'name' => 'Name 3', 'amount' => 0,
+                    ],
+                ],
+                null,
+            ],
+            [
+                [
+                    [
+                        'id' => 1, 'name' => 'Name 1', 'amount' => 1,
+                    ],
+                    [
+                        'id' => 2, 'name' => 'Name 2', 'amount' => 2,
+                    ],
+                ],
+                true,
+            ],
+            [
+                [
+                    [
+                        'id' => 3, 'name' => 'Name 3', 'amount' => 0,
+                    ],
+                ],
+                false,
+            ],
+        ];
+    }
 
-        return $method->invokeArgs($object, $parameters);
+    public function testShouldThrowNotFoundExceptionWhenClientResponseOKOnFindByProductFilter(): void
+    {
+        $this->expectException(NotFoundException::class);
+
+        $response = new MockResponse('', ['http_code' => 404]);
+        $client = new MockHttpClient($response);
+        $testRepository = new ProductRepository($client);
+        $filter = new ProductFilter();
+        $testRepository->findByProductFilter($filter);
+    }
+
+    public function testShouldThrowConnectionExceptionWhenClientNotResponseOKOnFindByProductFilter(): void
+    {
+        $this->expectException(ConnectionException::class);
+
+        $response = new MockResponse('', ['http_code' => 500]);
+        $client = new MockHttpClient($response);
+        $testRepository = new ProductRepository($client);
+        $filter = new ProductFilter();
+        $testRepository->findByProductFilter($filter);
+    }
+
+    public function testShouldThrowConnectionExceptionWhenClientResponseErrorOnFindByProductFilter(): void
+    {
+        $this->expectException(ConnectionException::class);
+
+        $response = new MockResponse('', ['error' => 'error']);
+        $client = new MockHttpClient($response);
+        $testRepository = new ProductRepository($client);
+        $filter = new ProductFilter();
+        $testRepository->findByProductFilter($filter);
+    }
+
+    public function testShouldThrowDataTransferExceptionWhenClientResponseWrongDataOnFindByProductFilter(): void
+    {
+        $this->expectException(DataTransferException::class);
+
+        $response = new MockResponse('');
+        $client = new MockHttpClient($response);
+        $testRepository = new ProductRepository($client);
+        $filter = new ProductFilter();
+        $testRepository->findByProductFilter($filter);
+    }
+
+    /**
+     * @dataProvider dataForCreateProduct
+     */
+    public function testCreateProduct(array $item, ?Product $expected): void
+    {
+        $client = new MockHttpClient();
+        $testRepository = new ProductRepository($client);
+        $actual = Helper::invokeMethod($testRepository, 'createProduct', [$item]);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function dataForCreateProduct(): array
+    {
+        $product1 = new Product(1);
+        $product1->setName('Name 1');
+        $product1->setAmount(1);
+
+        return [
+            [
+                [
+                    'id' => 0, 'name' => 'Name 1', 'amount' => 1,
+                ],
+                null,
+            ],
+            [
+                [
+                    'id' => 1, 'name' => 'Name 1', 'amount' => 1,
+                ],
+                $product1,
+            ],
+        ];
     }
 }

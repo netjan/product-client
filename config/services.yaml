@@ -26,3 +26,7 @@ services:
     App\Repository\ProductRepository:
         arguments:
             $client: '@my_api.client'
+
+when@test:
+    services:
+        App\Tests\Fixtures\MockClientCallback: ~

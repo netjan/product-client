@@ -28,7 +28,7 @@ class ProductRepository implements HttpClientInterface
     {
         $query = [];
         if (null !== $filter->stock) {
-            $query['archived'] = $filter->stock;
+            $query['stock'] = $filter->stock;
         }
 
         $response = $this->request('GET', self::RELATIVE_URL, [
@@ -57,17 +57,18 @@ class ProductRepository implements HttpClientInterface
 
     private function createProduct(array $item): ?Product
     {
-        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+        $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
+            ->disableExceptionOnInvalidPropertyPath()
+            ->getPropertyAccessor();
 
-        $id = (int) $propertyAccessor->getValue($item, '[isbn]');
+        $id = (int) $propertyAccessor->getValue($item, '[id]');
         if (1 > $id) {
             return null;
         }
 
         $product = new Product($id);
-        $product->setName((string) $propertyAccessor->getValue($item, '[title]'));
-        $a = (array) $propertyAccessor->getValue($item, '[reviews]');
-        $product->setAmount(count($a));
+        $product->setName((string) $propertyAccessor->getValue($item, '[name]'));
+        $product->setAmount((int) $propertyAccessor->getValue($item, '[amount]'));
 
         return $product;
     }

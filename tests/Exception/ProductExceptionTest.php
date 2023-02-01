@@ -29,8 +29,10 @@ class ProductExceptionTest extends TestCase
     public function classesDataProvider(): array
     {
         return [
-            [NotFoundException::class],
             [ConnectionException::class],
+            [DataTransferException::class],
+            [NotFoundException::class],
+
         ];
     }
 
