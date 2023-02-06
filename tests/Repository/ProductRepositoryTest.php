@@ -3,13 +3,13 @@
 namespace App\Tests\Repository;
 
 use App\Entity\Product;
-use App\Filter\ProductFilter;
-use App\Tests\Fixtures\Helper;
-use PHPUnit\Framework\TestCase;
-use App\Exception\NotFoundException;
-use App\Repository\ProductRepository;
 use App\Exception\ConnectionException;
 use App\Exception\DataTransferException;
+use App\Exception\NotFoundException;
+use App\Filter\ProductFilter;
+use App\Repository\ProductRepository;
+use App\Tests\Fixtures\Helper;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
@@ -22,6 +22,36 @@ class ProductRepositoryTest extends TestCase
         $this->assertInstanceOf(ProductRepository::class, $testRepository);
     }
 
+    /**
+     * @dataProvider dataForFind
+     */
+    public function testFind(array $dataBody, Product $expected): void
+    {
+        $response = new MockResponse(json_encode($dataBody));
+        $client = new MockHttpClient($response);
+        $testRepository = new ProductRepository($client);
+        $actual = $testRepository->find(1);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function dataForFind(): \Generator
+    {
+        $data = [
+            [
+                'id' => 1, 'name' => 'Name 1', 'amount' => 1,
+            ],
+
+        ];
+        foreach($data as $dataBody) {
+            $product = new Product($dataBody['id']);
+            $product->setName($dataBody['name']);
+            $product->setAmount($dataBody['amount']);
+            yield [
+                $dataBody,
+                $product,
+            ];
+        }
+    }
     /**
      * @dataProvider dataForFindByProductFilter
      */

@@ -2,11 +2,11 @@
 
 namespace App\Tests\Exception;
 
-use PHPUnit\Framework\TestCase;
-use App\Exception\NotFoundException;
-use App\Exception\ExceptionInterface;
 use App\Exception\ConnectionException;
 use App\Exception\DataTransferException;
+use App\Exception\ExceptionInterface;
+use App\Exception\NotFoundException;
+use PHPUnit\Framework\TestCase;
 
 class ProductExceptionTest extends TestCase
 {
@@ -32,7 +32,6 @@ class ProductExceptionTest extends TestCase
             [ConnectionException::class],
             [DataTransferException::class],
             [NotFoundException::class],
-
         ];
     }
 

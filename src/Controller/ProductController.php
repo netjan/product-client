@@ -14,6 +14,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * @psalm-suppress PropertyNotSetInConstructor
+ */
 #[Route('/product')]
 class ProductController extends AbstractController
 {
@@ -50,8 +53,19 @@ class ProductController extends AbstractController
     #[Route('/new', name: 'app_product_new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
-        return $this->render('product/index.html.twig', [
-            'products' => [],
+        $product = new Product();
+        $form = $this->createForm(ProductType::class, $product);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->productRepository->save($product);
+
+            return $this->redirectToRoute('app_product_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('product/new.html.twig', [
+            'product' => $product,
+            'form' => $form,
         ]);
     }
 

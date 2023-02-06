@@ -21,17 +21,16 @@ class ProductRepository implements HttpClientInterface
 
     private const RELATIVE_URL = 'products';
 
+    /**
+     * @throws ConnectionException
+     * @throws NotFoundException
+     * @throws DataTransferException
+     */
     public function find(string $id): ?Product
     {
         $response = $this->request('GET', self::RELATIVE_URL.'/'.$id);
 
-        $statusCode = $this->getStatusCode($response);
-        if (Response::HTTP_NOT_FOUND === $statusCode) {
-            return null;
-        }
-        if (Response::HTTP_OK !== $statusCode) {
-            throw new ConnectionException();
-        }
+        $this->checkStatusCode($response);
         $item = $this->responseToArray($response);
 
         return $this->createProduct($item);
@@ -39,6 +38,10 @@ class ProductRepository implements HttpClientInterface
 
     /**
      * @return Product[]
+     *
+     * @throws ConnectionException
+     * @throws NotFoundException
+     * @throws DataTransferException
      */
     public function findByProductFilter(ProductFilter $filter): array
     {
@@ -51,14 +54,7 @@ class ProductRepository implements HttpClientInterface
             'query' => $query,
         ]);
 
-        $statusCode = $this->getStatusCode($response);
-        if (Response::HTTP_NOT_FOUND === $statusCode) {
-            throw new NotFoundException();
-        }
-        if (Response::HTTP_OK !== $statusCode) {
-            throw new ConnectionException();
-        }
-
+        $this->checkStatusCode($response);
         $items = $this->responseToArray($response);
         $result = [];
         /** @var array $item */
@@ -71,34 +67,35 @@ class ProductRepository implements HttpClientInterface
         return $result;
     }
 
+    /**
+     * @throws ConnectionException
+     * @throws NotFoundException
+     */
     public function save(Product $product): void
     {
-        $id = (string) $product->getId();
-        $response = $this->request('PUT', self::RELATIVE_URL.'/'.$id, [
-            'json' => [
-                'name' => $product->getName(),
-                'amount' => $product->getAmount(),
-            ],
-        ]);
-        $statusCode = $this->getStatusCode($response);
-        if (Response::HTTP_NOT_FOUND === $statusCode) {
-            throw new NotFoundException();
+        $dataBody = [
+            'name' => $product->getName(),
+            'amount' => $product->getAmount(),
+        ];
+        if (null === $id = $product->getId()) {
+            $response = $this->request('POST', self::RELATIVE_URL, [
+                'json' => $dataBody,
+            ]);
+            $expectedSatusCode = Response::HTTP_CREATED;
+        } else {
+            $response = $this->request('PUT', self::RELATIVE_URL.'/'.$id, [
+                'json' => $dataBody,
+            ]);
+            $expectedSatusCode = Response::HTTP_OK;
         }
-        if (Response::HTTP_OK !== $statusCode) {
-            throw new ConnectionException();
-        }
-        $item = $this->responseToArray($response);
 
-        $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
-            ->disableExceptionOnInvalidPropertyPath()
-            ->getPropertyAccessor();
-
-        $product->setName((string) $propertyAccessor->getValue($item, '[name]'));
-        $product->setAmount((int) $propertyAccessor->getValue($item, '[amount]'));
+        $this->checkStatusCode($response, $expectedSatusCode);
     }
 
     public function remove(string $id): void
     {
+        $response = $this->request('DELETE', self::RELATIVE_URL.'/'.$id);
+        $this->checkStatusCode($response, Response::HTTP_NO_CONTENT);
     }
 
     private function createProduct(array $item): ?Product
@@ -119,6 +116,9 @@ class ProductRepository implements HttpClientInterface
         return $product;
     }
 
+    /**
+     * @throws DataTransferException
+     */
     private function responseToArray(ResponseInterface $response): array
     {
         try {
@@ -130,14 +130,25 @@ class ProductRepository implements HttpClientInterface
         return $items;
     }
 
-    private function getStatusCode(ResponseInterface $response): int
-    {
+    /**
+     * @throws ConnectionException
+     * @throws NotFoundException
+     */
+    private function checkStatusCode(
+        ResponseInterface $response,
+        int $expectedSatusCode = Response::HTTP_OK
+    ): void {
         try {
             $statusCode = $response->getStatusCode();
         } catch (ExceptionInterface $e) {
             throw new ConnectionException($e);
         }
 
-        return $statusCode;
+        if (Response::HTTP_NOT_FOUND === $statusCode) {
+            throw new NotFoundException();
+        }
+        if ($expectedSatusCode !== $statusCode) {
+            throw new ConnectionException();
+        }
     }
 }
