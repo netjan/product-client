@@ -49,8 +49,9 @@ class MockClientCallback
             }
             if ('404' === $id) {
                 $dataBody = [
-                    'id' => 0
+                    'id' => 0,
                 ];
+
                 return new MockResponse(json_encode([$dataBody]));
             }
         }
