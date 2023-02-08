@@ -12,6 +12,7 @@ use App\Tests\Fixtures\Helper;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class ProductRepositoryTest extends TestCase
 {
@@ -23,7 +24,7 @@ class ProductRepositoryTest extends TestCase
     }
 
     /**
-     * @dataProvider dataForFind
+     * @dataProvider dataProviderFind
      */
     public function testFind(array $dataBody, Product $expected): void
     {
@@ -34,26 +35,24 @@ class ProductRepositoryTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function dataForFind(): \Generator
+    public function dataProviderFind(): \Generator
     {
         $data = [
             [
                 'id' => 1, 'name' => 'Name 1', 'amount' => 1,
             ],
-
         ];
-        foreach($data as $dataBody) {
-            $product = new Product($dataBody['id']);
-            $product->setName($dataBody['name']);
-            $product->setAmount($dataBody['amount']);
+        foreach ($data as $dataBody) {
+            $product = $this->createProduct($dataBody);
             yield [
                 $dataBody,
                 $product,
             ];
         }
     }
+
     /**
-     * @dataProvider dataForFindByProductFilter
+     * @dataProvider dataProviderFindByProductFilter
      */
     public function testFindByProductFilter(array $expected, ?bool $stock): void
     {
@@ -79,7 +78,7 @@ class ProductRepositoryTest extends TestCase
         }
     }
 
-    public function dataForFindByProductFilter(): array
+    public function dataProviderFindByProductFilter(): array
     {
         return [
             [
@@ -163,7 +162,7 @@ class ProductRepositoryTest extends TestCase
     }
 
     /**
-     * @dataProvider dataForCreateProduct
+     * @dataProvider dataProviderCreateProduct
      */
     public function testCreateProduct(array $item, ?Product $expected): void
     {
@@ -173,11 +172,12 @@ class ProductRepositoryTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function dataForCreateProduct(): array
+    public function dataProviderCreateProduct(): array
     {
-        $product1 = new Product(1);
-        $product1->setName('Name 1');
-        $product1->setAmount(1);
+        $data = [
+            'id' => 1, 'name' => 'Name 1', 'amount' => 1,
+        ];
+        $product1 = $this->createProduct($data);
 
         return [
             [
@@ -193,5 +193,64 @@ class ProductRepositoryTest extends TestCase
                 $product1,
             ],
         ];
+    }
+
+    /**
+     * @dataProvider dataProviderSave
+     */
+    public function testSave(Product $product, int $responseStatusCode): void
+    {
+        $response = new MockResponse('', ['http_code' => $responseStatusCode]);
+        $client = new MockHttpClient($response);
+        $testRepository = new ProductRepository($client);
+        $testRepository->save($product);
+
+        // NotExpectException
+        $this->assertTrue(true);
+    }
+
+    public function dataProviderSave(): \Generator
+    {
+        $data = [
+            [
+                [
+                    'id' => 1, 'name' => 'Name 1', 'amount' => 1,
+                ],
+                Response::HTTP_OK,
+            ],
+            [
+                [
+                    'id' => null, 'name' => 'Name 1', 'amount' => 1,
+                ],
+                Response::HTTP_CREATED,
+            ],
+        ];
+        foreach ($data as $item) {
+            $product = $this->createProduct($item[0]);
+            yield [
+                $product,
+                $item[1],
+            ];
+        }
+    }
+
+    public function testRemove(): void
+    {
+        $response = new MockResponse('', ['http_code' => Response::HTTP_NO_CONTENT]);
+        $client = new MockHttpClient($response);
+        $testRepository = new ProductRepository($client);
+        $testRepository->remove(1);
+
+        // NotExpectException
+        $this->assertTrue(true);
+    }
+
+    private function createProduct(array $data): Product
+    {
+        $product = new Product($data['id']);
+        $product->setName($data['name']);
+        $product->setAmount($data['amount']);
+
+        return $product;
     }
 }

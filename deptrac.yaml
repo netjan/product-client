@@ -11,20 +11,61 @@ parameters:
                     type: className
                     regex: .*Controller.*
         -
+            name: Exception
+            collectors:
+                -
+                    type: className
+                    regex: ^App\\Exception\\
+        -
+            name: Entity
+            collectors:
+                -
+                    type: className
+                    regex: ^App\\Entity\\
+        -
+            name: Filter
+            collectors:
+                -
+                    type: className
+                    regex: ^App\\Filter\\
+        -
+            name: Form
+            collectors:
+                -
+                    type: className
+                    regex: ^App\\Form\\
+        -
             name: Repository
             collectors:
                 -
                     type: className
                     regex: .*Repository.*
-        -
-            name: Service
+        - 
+            name: Vendors
             collectors:
-                -
+                - 
                     type: className
-                    regex: .*Service.*
+                    regex: ^Symfony\\Component\\
+                - 
+                    type: className
+                    regex: ^Symfony\\Contracts\\
+
     ruleset:
         Controller:
-            - Service
-        Service:
+            - Exception
+            - Entity
+            - Filter
+            - Form
             - Repository
+            - Vendors
+        Entity:
+            - Vendors
+        Form:
+            - Entity
+            - Filter
+            - Vendors
         Repository:
+            - Exception
+            - Entity
+            - Filter
+            - Vendors
