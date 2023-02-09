@@ -26,7 +26,7 @@ class ProductRepository implements HttpClientInterface
      * @throws NotFoundException
      * @throws DataTransferException
      */
-    public function find(string $id): ?Product
+    public function find(int $id): ?Product
     {
         $response = $this->request('GET', self::RELATIVE_URL.'/'.$id);
 
@@ -92,7 +92,7 @@ class ProductRepository implements HttpClientInterface
         $this->checkStatusCode($response, $expectedSatusCode);
     }
 
-    public function remove(string $id): void
+    public function remove(int $id): void
     {
         $response = $this->request('DELETE', self::RELATIVE_URL.'/'.$id);
         $this->checkStatusCode($response, Response::HTTP_NO_CONTENT);

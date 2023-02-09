@@ -68,11 +68,18 @@ class ProductControllerTest extends WebTestCase
         self::assertPageTitleContains('Product');
     }
 
-    public function testShouldThrowNotFoundHttpExceptionWhenGetInvalidId(): void
+    public function testShouldThrowNotFoundHttpExceptionWhenGetInvalidId404(): void
     {
         $this->expectException(NotFoundHttpException::class);
 
         $this->client->request('GET', $this->path.'/404');
+    }
+
+    public function testShouldThrowNotFoundHttpExceptionWhenGetInvalidId500(): void
+    {
+        $this->expectException(NotFoundHttpException::class);
+
+        $this->client->request('GET', $this->path.'/500');
     }
 
     public function testShouldThrowNotFoundHttpExceptionWhenGetOther(): void

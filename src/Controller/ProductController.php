@@ -69,8 +69,8 @@ class ProductController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_product_show', methods: ['GET'])]
-    public function show(string $id): Response
+    #[Route('/{id<\d+>}', name: 'app_product_show', methods: ['GET'])]
+    public function show(int $id): Response
     {
         $product = $this->find($id);
 
@@ -79,8 +79,8 @@ class ProductController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_product_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, string $id): Response
+    #[Route('/{id<\d+>}/edit', name: 'app_product_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, int $id): Response
     {
         $product = $this->find($id);
         $form = $this->createForm(ProductType::class, $product);
@@ -98,8 +98,8 @@ class ProductController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_product_delete', methods: ['POST'])]
-    public function delete(Request $request, string $id): Response
+    #[Route('/{id<\d+>}', name: 'app_product_delete', methods: ['POST'])]
+    public function delete(Request $request, int $id): Response
     {
         if ($this->isCsrfTokenValid('app_product_delete'.$id, (string) $request->request->get('_token'))) {
             $this->productRepository->remove($id);
@@ -111,7 +111,7 @@ class ProductController extends AbstractController
     /**
      * @throws NotFoundHttpException
      */
-    private function find(string $id): Product
+    private function find(int $id): Product
     {
         try {
             $product = $this->productRepository->find($id);

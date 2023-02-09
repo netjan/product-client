@@ -54,6 +54,9 @@ class MockClientCallback
 
                 return new MockResponse(json_encode([$dataBody]));
             }
+            if ('500' === $id) {
+                return new MockResponse(json_encode([]), ['http_code' => 500]);
+            }
         }
 
         return new MockResponse(json_encode([]), ['http_code' => 400]);
