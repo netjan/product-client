@@ -53,7 +53,7 @@ class ProductControllerTest extends WebTestCase
         $form->setValues([
             'product' => [
                 'name' => 'Name 1',
-                'amount' => 5,
+                'quantity' => 5,
             ],
         ]);
         $this->client->submit($form);
@@ -101,7 +101,7 @@ class ProductControllerTest extends WebTestCase
         $form->setValues([
             'product' => [
                 'name' => 'Name 1',
-                'amount' => 5,
+                'quantity' => 5,
             ],
         ]);
         $this->client->submit($form);

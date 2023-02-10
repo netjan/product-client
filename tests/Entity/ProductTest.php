@@ -20,7 +20,7 @@ class ProductTest extends TestCase
         $this->assertInstanceOf(Product::class, $this->entityTest);
         $this->assertNull($this->entityTest->getId());
         $this->assertNull($this->entityTest->getName());
-        $this->assertNull($this->entityTest->getAmount());
+        $this->assertNull($this->entityTest->getQuantity());
 
         $data = $this->entityTest->toArray();
         foreach ($data as $item) {
@@ -34,7 +34,7 @@ class ProductTest extends TestCase
     public function propertyGetSet(): \Generator
     {
         yield ['name', 'StringValue'];
-        yield ['amount', 1];
+        yield ['quantity', 1];
     }
 
     /**
@@ -64,9 +64,9 @@ class ProductTest extends TestCase
             ['name', Assert\NotBlank::class, []],
             ['name', Assert\Type::class, ['string']],
             ['name', Assert\Length::class, ['max' => 255]],
-            ['amount', Assert\NotBlank::class, []],
-            ['amount', Assert\Type::class, ['integer']],
-            ['amount', Assert\GreaterThanOrEqual::class, [0]],
+            ['quantity', Assert\NotBlank::class, []],
+            ['quantity', Assert\Type::class, ['integer']],
+            ['quantity', Assert\GreaterThanOrEqual::class, [0]],
         ];
     }
 

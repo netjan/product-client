@@ -42,7 +42,7 @@ class MockClientCallback
         if ('products' === $resource) {
             if ('1' === $id) {
                 $dataBody = [
-                    'id' => 1, 'name' => 'Name 1', 'amount' => 1,
+                    'id' => 1, 'name' => 'Name 1', 'quantity' => 1,
                 ];
 
                 return new MockResponse(json_encode($dataBody));
@@ -76,7 +76,7 @@ class MockClientCallback
         if ('products' === $resource) {
             if ($id) {
                 $dataBody = [
-                    'id' => 1, 'name' => 'Name 1', 'amount' => 1,
+                    'id' => 1, 'name' => 'Name 1', 'quantity' => 1,
                 ];
 
                 return new MockResponse(json_encode($dataBody));

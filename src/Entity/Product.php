@@ -18,7 +18,7 @@ class Product
     #[Assert\NotBlank]
     #[Assert\Type('integer')]
     #[Assert\GreaterThanOrEqual(0)]
-    private ?int $amount = null;
+    private ?int $quantity = null;
 
     public function __construct(?int $id = null)
     {
@@ -29,7 +29,7 @@ class Product
     {
         return [
             'name' => $this->name,
-            'amount' => $this->amount,
+            'quantity' => $this->quantity,
         ];
     }
 
@@ -50,14 +50,14 @@ class Product
         return $this;
     }
 
-    public function getAmount(): ?int
+    public function getQuantity(): ?int
     {
-        return $this->amount;
+        return $this->quantity;
     }
 
-    public function setAmount(?int $amount): self
+    public function setQuantity(?int $quantity): self
     {
-        $this->amount = $amount;
+        $this->quantity = $quantity;
 
         return $this;
     }

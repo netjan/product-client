@@ -75,7 +75,7 @@ class ProductRepository implements HttpClientInterface
     {
         $dataBody = [
             'name' => $product->getName(),
-            'amount' => $product->getAmount(),
+            'quantity' => $product->getQuantity(),
         ];
         if (null === $id = $product->getId()) {
             $response = $this->request('POST', self::RELATIVE_URL, [
@@ -111,7 +111,7 @@ class ProductRepository implements HttpClientInterface
 
         $product = new Product($id);
         $product->setName((string) $propertyAccessor->getValue($item, '[name]'));
-        $product->setAmount((int) $propertyAccessor->getValue($item, '[amount]'));
+        $product->setQuantity((int) $propertyAccessor->getValue($item, '[quantity]'));
 
         return $product;
     }

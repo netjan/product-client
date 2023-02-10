@@ -39,7 +39,7 @@ class ProductRepositoryTest extends TestCase
     {
         $data = [
             [
-                'id' => 1, 'name' => 'Name 1', 'amount' => 1,
+                'id' => 1, 'name' => 'Name 1', 'quantity' => 1,
             ],
         ];
         foreach ($data as $dataBody) {
@@ -68,7 +68,7 @@ class ProductRepositoryTest extends TestCase
             foreach ($actual as $product) {
                 if ($item['id'] === $product->getId()) {
                     $this->assertSame($item['name'], $product->getName());
-                    $this->assertSame($item['amount'], $product->getAmount());
+                    $this->assertSame($item['quantity'], $product->getQuantity());
                     $isFound = true;
                 }
             }
@@ -84,13 +84,13 @@ class ProductRepositoryTest extends TestCase
             [
                 [
                     [
-                        'id' => 1, 'name' => 'Name 1', 'amount' => 1,
+                        'id' => 1, 'name' => 'Name 1', 'quantity' => 1,
                     ],
                     [
-                        'id' => 2, 'name' => 'Name 2', 'amount' => 2,
+                        'id' => 2, 'name' => 'Name 2', 'quantity' => 2,
                     ],
                     [
-                        'id' => 3, 'name' => 'Name 3', 'amount' => 0,
+                        'id' => 3, 'name' => 'Name 3', 'quantity' => 0,
                     ],
                 ],
                 null,
@@ -98,10 +98,10 @@ class ProductRepositoryTest extends TestCase
             [
                 [
                     [
-                        'id' => 1, 'name' => 'Name 1', 'amount' => 1,
+                        'id' => 1, 'name' => 'Name 1', 'quantity' => 1,
                     ],
                     [
-                        'id' => 2, 'name' => 'Name 2', 'amount' => 2,
+                        'id' => 2, 'name' => 'Name 2', 'quantity' => 2,
                     ],
                 ],
                 true,
@@ -109,7 +109,7 @@ class ProductRepositoryTest extends TestCase
             [
                 [
                     [
-                        'id' => 3, 'name' => 'Name 3', 'amount' => 0,
+                        'id' => 3, 'name' => 'Name 3', 'quantity' => 0,
                     ],
                 ],
                 false,
@@ -175,20 +175,20 @@ class ProductRepositoryTest extends TestCase
     public function dataProviderCreateProduct(): array
     {
         $data = [
-            'id' => 1, 'name' => 'Name 1', 'amount' => 1,
+            'id' => 1, 'name' => 'Name 1', 'quantity' => 1,
         ];
         $product1 = $this->createProduct($data);
 
         return [
             [
                 [
-                    'id' => 0, 'name' => 'Name 1', 'amount' => 1,
+                    'id' => 0, 'name' => 'Name 1', 'quantity' => 1,
                 ],
                 null,
             ],
             [
                 [
-                    'id' => 1, 'name' => 'Name 1', 'amount' => 1,
+                    'id' => 1, 'name' => 'Name 1', 'quantity' => 1,
                 ],
                 $product1,
             ],
@@ -214,13 +214,13 @@ class ProductRepositoryTest extends TestCase
         $data = [
             [
                 [
-                    'id' => 1, 'name' => 'Name 1', 'amount' => 1,
+                    'id' => 1, 'name' => 'Name 1', 'quantity' => 1,
                 ],
                 Response::HTTP_OK,
             ],
             [
                 [
-                    'id' => null, 'name' => 'Name 1', 'amount' => 1,
+                    'id' => null, 'name' => 'Name 1', 'quantity' => 1,
                 ],
                 Response::HTTP_CREATED,
             ],
@@ -249,7 +249,7 @@ class ProductRepositoryTest extends TestCase
     {
         $product = new Product($data['id']);
         $product->setName($data['name']);
-        $product->setAmount($data['amount']);
+        $product->setQuantity($data['quantity']);
 
         return $product;
     }
