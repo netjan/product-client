@@ -12,4 +12,4 @@ If you want to try to use and tweak that example, you can follow these steps:
 
 
 ## Web application API server
-Web application API server is required to use this application. See details at page `https://github.com/netjan/product-server`.
+Web application API server is required to use this application. See details at page https://github.com/netjan/product-server.
