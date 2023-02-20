@@ -4,7 +4,6 @@
 If you want to try to use and tweak that example, you can follow these steps:
 
 1. Run `git clone https://github.com/netjan/product-client` to clone the project
-1. Generate the certificate `make certificate`
 1. Create docker networks if not exist `docker network create backend` and `docker network create frontend`
 1. Run `make install` to install the project
 1. Run `make start` to up your containers

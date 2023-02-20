@@ -89,9 +89,3 @@ fix-cs:
 	@$(EXEC) vendor/bin/php-cs-fixer fix
 
 .PHONY: fix-cs
-
-## Generate a self-signed SSL certificate using OpenSSL
-certificate:
-	openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ./docker/nginx/server.key -out ./docker/nginx/server.crt
-
-.PHONY: certificate
